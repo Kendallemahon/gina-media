@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Random Media</title>
+  <style>
+    body { text-align: center; padding: 50px; }
+    img, video { max-width: 90%; height: auto; }
+  </style>
+</head>
+<body>
+  <div id="mediaContainer">Loading...</div>
+
+  <script>
+    // List of media URLs (can be images or videos)
+    const mediaList = [
+      "https://drive.google.com/drive/folders/1duZB8PF4OXcnXWwYE_GPJDQYyoufFjP2?usp=sharing",
+      // Add more links as needed
+    ];
+
+    function showRandomMedia() {
+      const randomIndex = Math.floor(Math.random() * mediaList.length);
+      const selectedMedia = mediaList[randomIndex];
+      const container = document.getElementById('mediaContainer');
+      
+      // Check file type by extension to decide how to embed
+      if (selectedMedia.match(/\.(jpeg|jpg|gif|png)$/i)) {
+        container.innerHTML = `<img src="${selectedMedia}" alt="Random Image">`;
+      } else if (selectedMedia.match(/\.(mp4|webm|ogg)$/i)) {
+        container.innerHTML = `<video controls autoplay>
+                                 <source src="${selectedMedia}" type="video/mp4">
+                                 Your browser does not support the video tag.
+                               </video>`;
+      } else {
+        // If not an image or video, just display the link
+        container.innerHTML = `<a href="${selectedMedia}">Open Media</a>`;
+      }
+    }
+
+    // Run on page load
+    window.onload = showRandomMedia;
+  </script>
+</body>
+</html>
