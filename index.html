@@ -5,40 +5,80 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Random Media</title>
   <style>
-    body { text-align: center; padding: 50px; }
-    img, video { max-width: 90%; height: auto; }
+    body { 
+      text-align: center; 
+      padding: 50px; 
+      font-family: Arial, sans-serif; 
+    }
+    img, video { 
+      max-width: 90%; 
+      height: auto; 
+      border: 1px solid #ccc; 
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    #mediaContainer {
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
+  <h1>Random Media Display</h1>
   <div id="mediaContainer">Loading...</div>
 
   <script>
-    // List of media URLs (can be images or videos)
-    const mediaList = [
-      "https://drive.google.com/drive/folders/1duZB8PF4OXcnXWwYE_GPJDQYyoufFjP2?usp=sharing",
-      // Add more links as needed
-    ];
+    // URL of your Google Apps Script Web App
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbx1Iv-AKiVUGntwpkFTJiUPj5ytgIXj_41fttgMX3t1c_N4AZk7XFRwi7v5YjWXzM62OQ/exec";
 
-    function showRandomMedia() {
-      const randomIndex = Math.floor(Math.random() * mediaList.length);
-      const selectedMedia = mediaList[randomIndex];
+    async function showRandomMedia() {
       const container = document.getElementById('mediaContainer');
-      
-      // Check file type by extension to decide how to embed
-      if (selectedMedia.match(/\.(jpeg|jpg|gif|png)$/i)) {
-        container.innerHTML = `<img src="${selectedMedia}" alt="Random Image">`;
-      } else if (selectedMedia.match(/\.(mp4|webm|ogg)$/i)) {
-        container.innerHTML = `<video controls autoplay>
-                                 <source src="${selectedMedia}" type="video/mp4">
-                                 Your browser does not support the video tag.
-                               </video>`;
-      } else {
-        // If not an image or video, just display the link
-        container.innerHTML = `<a href="${selectedMedia}">Open Media</a>`;
+      try {
+        const response = await fetch(scriptUrl);
+        const data = await response.json();
+
+        if (data.error) {
+          container.innerText = "Error: " + data.error;
+          return;
+        }
+
+        const selectedMedia = data.url;
+
+        // Clear previous content
+        container.innerHTML = "";
+
+        // Decide how to embed based on file extension
+        if (selectedMedia.match(/\.(jpeg|jpg|gif|png)$/i)) {
+          const img = document.createElement('img');
+          img.src = selectedMedia;
+          img.alt = "Random Image";
+          container.appendChild(img);
+        } else if (selectedMedia.match(/\.(mp4|webm|ogg)$/i)) {
+          const video = document.createElement('video');
+          video.controls = true;
+          video.autoplay = true;
+          const source = document.createElement('source');
+          source.src = selectedMedia;
+          // Guess MIME type based on extension
+          if (selectedMedia.endsWith('.mp4')) {
+            source.type = "video/mp4";
+          } else if (selectedMedia.endsWith('.webm')) {
+            source.type = "video/webm";
+          } else if (selectedMedia.endsWith('.ogg')) {
+            source.type = "video/ogg";
+          }
+          video.appendChild(source);
+          container.appendChild(video);
+        } else {
+          const link = document.createElement('a');
+          link.href = selectedMedia;
+          link.target = "_blank";
+          link.innerText = "Open Media";
+          container.appendChild(link);
+        }
+      } catch (err) {
+        container.innerText = "Fetch error: " + err;
       }
     }
 
-    // Run on page load
     window.onload = showRandomMedia;
   </script>
 </body>
