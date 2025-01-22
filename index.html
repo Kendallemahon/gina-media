@@ -10,7 +10,7 @@
       padding: 50px; 
       font-family: Arial, sans-serif; 
     }
-    img, video { 
+    img, video, iframe { 
       max-width: 90%; 
       height: auto; 
       border: 1px solid #ccc; 
@@ -47,17 +47,19 @@
 
         // Decide how to embed based on file extension
         if (selectedMedia.match(/\.(jpeg|jpg|gif|png)$/i)) {
+          // If it's an image
           const img = document.createElement('img');
           img.src = selectedMedia;
           img.alt = "Random Image";
           container.appendChild(img);
         } else if (selectedMedia.match(/\.(mp4|webm|ogg)$/i)) {
+          // If it's a video
           const video = document.createElement('video');
           video.controls = true;
           video.autoplay = true;
           const source = document.createElement('source');
           source.src = selectedMedia;
-          // Guess MIME type based on extension
+          // Set MIME type based on extension
           if (selectedMedia.endsWith('.mp4')) {
             source.type = "video/mp4";
           } else if (selectedMedia.endsWith('.webm')) {
@@ -68,11 +70,13 @@
           video.appendChild(source);
           container.appendChild(video);
         } else {
-          const link = document.createElement('a');
-          link.href = selectedMedia;
-          link.target = "_blank";
-          link.innerText = "Open Media";
-          container.appendChild(link);
+          // For any other file type, embed using an iframe
+          const iframe = document.createElement('iframe');
+          iframe.src = selectedMedia;
+          iframe.width = "800";  // Set desired width
+          iframe.height = "600"; // Set desired height
+          iframe.frameBorder = "0";
+          container.appendChild(iframe);
         }
       } catch (err) {
         container.innerText = "Fetch error: " + err;
